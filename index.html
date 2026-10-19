@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ошхона Онлайн - Фармоиш тавассути QR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col font-sans">
+
+    <header class="bg-amber-600 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i data-lucide="utensils-crossed" class="w-8 h-8"></i>
+                <span class="font-bold text-xl tracking-wide">Ошхонаи Миллӣ</span>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="bg-amber-700 p-1 rounded-lg flex text-sm font-medium">
+                    <button id="nav-guest-btn" onclick="switchMode('guest')" class="px-3 py-1.5 rounded-md bg-white text-amber-900 shadow transition-all flex items-center gap-1.5">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                        <span>Меҳмон</span>
+                    </button>
+                    <button id="nav-kitchen-btn" onclick="switchMode('kitchen')" class="px-3 py-1.5 rounded-md text-amber-100 hover:text-white transition-all flex items-center gap-1.5 relative">
+                        <i data-lucide="chef-hat" class="w-4 h-4"></i>
+                        <span>Ошхона</span>
+                        <span id="kitchen-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+                    </button>
+                </div>
+
+                <div id="table-selector-wrap" class="bg-amber-700 text-white text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                    <span>Миз:</span>
+                    <select id="table-select" onchange="changeTable(this.value)" class="bg-amber-800 text-white font-bold rounded px-1 py-0.5 outline-none cursor-pointer">
+                        <option value="1">№ 1</option>
+                        <option value="2">№ 2</option>
+                        <option value="3">№ 3</option>
+                        <option value="4">№ 4</option>
+                        <option value="5">№ 5</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="guest-view" class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 pb-24">
+        <div class="flex gap-2 overflow-x-auto pb-4 pt-1 no-scrollbar mb-6">
+            <button onclick="filterCategory('all')" class="cat-btn active px-4 py-2 rounded-full border border-amber-600 bg-amber-600 text-white whitespace-nowrap text-sm font-medium transition-all shadow-sm">Ҳама хӯрокҳо</button>
+            <button onclick="filterCategory('mains')" class="cat-btn px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 whitespace-nowrap text-sm font-medium transition-all hover:border-amber-500 shadow-sm">Хӯрокҳои асосӣ</button>
+            <button onclick="filterCategory('fastfood')" class="cat-btn px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 whitespace-nowrap text-sm font-medium transition-all hover:border-amber-500 shadow-sm">Фастфуд ва Пицца</button>
+            <button onclick="filterCategory('kebabs')" class="cat-btn px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 whitespace-nowrap text-sm font-medium transition-all hover:border-amber-500 shadow-sm">Кабобҳо</button>
+            <button onclick="filterCategory('drinks')" class="cat-btn px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 whitespace-nowrap text-sm font-medium transition-all hover:border-amber-500 shadow-sm">Нӯшокиҳо</button>
+            <button onclick="filterCategory('desserts')" class="cat-btn px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 whitespace-nowrap text-sm font-medium transition-all hover:border-amber-500 shadow-sm">Шириниҳо</button>
+        </div>
+
+        <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+
+        <div id="active-guest-orders" class="mt-12 hidden">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-gray-800">
+                <i data-lucide="clock" class="text-amber-600"></i>
+                Фармоишҳои ҷории шумо:
+            </h2>
+            <div id="guest-orders-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+    </main>
+
+    <main id="kitchen-view" class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 hidden">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Экран ва панели Ошпаз</h1>
+                <p class="text-sm text-gray-500">Фармоишҳоро дар вақти воқеӣ идора кунед</p>
+            </div>
+            <button onclick="clearCompletedOrders()" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-lg font-medium transition-all flex items-center gap-1">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Тоза кардани тайёрҳо
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 min-h-[500px]">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200">
+                    <span class="font-bold text-gray-700 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-500 inline-block animate-pulse"></span>
+                        Нав (Омадааст)
+                    </span>
+                    <span id="count-new" class="bg-red-100 text-red-700 text-xs font-bold px-2.5 py-1 rounded-full">0</span>
+                </div>
+                <div id="column-new" class="space-y-4"></div>
+            </div>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 min-h-[500px]">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200">
+                    <span class="font-bold text-gray-700 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                        Дар омодашавӣ
+                    </span>
+                    <span id="count-preparing" class="bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full">0</span>
+                </div>
+                <div id="column-preparing" class="space-y-4"></div>
+            </div>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 min-h-[500px]">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200">
+                    <span class="font-bold text-gray-700 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                        Омода аст (Баред)
+                    </span>
+                    <span id="count-ready" class="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">0</span>
+                </div>
+                <div id="column-ready" class="space-y-4"></div>
+            </div>
+        </div>
+    </main>
+
+    <div id="cart-bar" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-30 transition-transform duration-300 translate-y-full">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="relative bg-amber-100 p-3 rounded-full text-amber-700">
+                    <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                    <span id="cart-count-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Ҷамъбасти фармоиш:</p>
+                    <p id="cart-total-price" class="text-lg font-bold text-gray-800">0 TJS</p>
+                </div>
+            </div>
+            <button onclick="toggleCartModal(true)" class="bg-amber-600 hover:bg-amber-700 text-white font-medium px-6 py-2.5 rounded-xl transition-all flex items-center gap-2 shadow-md">
+                <span>Дидани сабад</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="cart-modal" class="fixed inset-0 bg-black/50 z-50 flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between transform translate-x-full transition-transform duration-300" id="cart-modal-content">
+            <div>
+                <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="shopping-cart" class="text-amber-600"></i>
+                        <h3 class="font-bold text-lg">Сабади шумо (Миз №<span id="cart-modal-table">1</span>)</h3>
+                    </div>
+                    <button onclick="toggleCartModal(false)" class="text-gray-400 hover:text-gray-600 p-1">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <div id="cart-items-list" class="p-4 space-y-4 max-h-[calc(100vh-250px)] overflow-y-auto"></div>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 bg-gray-50">
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between text-sm text-gray-600">
+                        <span>Вақти тахминии омодашавӣ:</span>
+                        <span id="cart-max-time" class="font-bold text-amber-600">0 дақиқа</span>
+                    </div>
+                    <div class="flex justify-between text-base font-bold text-gray-800 pt-2 border-t">
+                        <span>Маблағи умумӣ:</span>
+                        <span id="cart-modal-total" class="text-amber-600 text-xl">0 TJS</span>
+                    </div>
+                </div>
+                <button onclick="submitOrder()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl transition-all shadow-md flex justify-center items-center gap-2">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                    <span>Фиристодани фармоиш ба ошхона</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.cat-btn.active {
+    background-color: #d97706;
+    color: #ffffff;
+    border-color: #d97706;
+}
+
+.food-card {
+    transition: transform 0.2s ease, shadow 0.2s ease;
+}
+.food-card:hover {
+    transform: translateY(-4px);
+}
